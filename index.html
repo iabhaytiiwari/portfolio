@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abhay Tiwari — Senior Staff Software Engineer</title>
+<style>
+  :root{
+    --bg:#000;
+    --bg2:#0a0a0c;
+    --fg:#f5f5f7;
+    --muted:#86868b;
+    --accent:#2997ff;
+    --card:#1d1d1f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Helvetica,Arial,sans-serif;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  /* NAV */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:1000;
+    display:flex;align-items:center;justify-content:center;
+    gap:2.5rem;
+    padding:14px 20px;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    font-size:13px;
+    font-weight:500;
+    transition:transform .4s ease;
+  }
+  nav a{color:var(--muted);transition:color .25s ease;}
+  nav a:hover{color:var(--fg);}
+  nav.hide{transform:translateY(-100%);}
+
+  section{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 24px;
+    position:relative;
+  }
+
+  /* HERO */
+  #hero{
+    background:radial-gradient(ellipse at 50% 30%, #1c1c1e 0%, #000 70%);
+  }
+  .eyebrow{
+    color:var(--accent);
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:.5px;
+    opacity:0;
+    animation:fadeUp 1s ease forwards .2s;
+  }
+  .hero-title{
+    font-size:clamp(2.8rem,8vw,6.5rem);
+    font-weight:700;
+    letter-spacing:-.03em;
+    line-height:1.05;
+    background:linear-gradient(180deg,#fff 0%,#a1a1a6 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    opacity:0;
+    animation:fadeUp 1s ease forwards .4s;
+    margin-top:12px;
+  }
+  .hero-sub{
+    font-size:clamp(1.1rem,2.5vw,1.6rem);
+    color:var(--muted);
+    margin-top:20px;
+    max-width:700px;
+    opacity:0;
+    animation:fadeUp 1s ease forwards .6s;
+  }
+  .hero-cta{
+    margin-top:40px;
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    justify-content:center;
+    opacity:0;
+    animation:fadeUp 1s ease forwards .8s;
+  }
+  .btn{
+    padding:12px 26px;
+    border-radius:100px;
+    font-size:15px;
+    font-weight:500;
+    transition:transform .25s ease, background .25s ease;
+    display:inline-block;
+  }
+  .btn-primary{background:var(--accent);color:#000;font-weight:600;}
+  .btn-primary:hover{transform:scale(1.05);background:#5cb3ff;}
+  .btn-secondary{border:1px solid rgba(255,255,255,0.3);color:#fff;}
+  .btn-secondary:hover{background:rgba(255,255,255,0.08);transform:scale(1.05);}
+
+  .scroll-hint{
+    position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+    font-size:12px;color:var(--muted);
+    animation:bounce 2s infinite;
+  }
+  @keyframes bounce{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,10px);}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+  /* SECTION HEADERS */
+  .section-title{
+    font-size:clamp(2rem,5vw,3.6rem);
+    font-weight:700;
+    letter-spacing:-.02em;
+    margin-bottom:16px;
+  }
+  .section-sub{
+    color:var(--muted);
+    font-size:1.15rem;
+    max-width:640px;
+    margin-bottom:60px;
+  }
+
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease, transform .8s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  /* SCROLL-SCRUBBED SECTIONS — each animation is fully segregated: its own
+     pinned section, its own scroll range, its own progress calculation. */
+  .scrub-section{
+    position:relative;
+    height:220vh;
+    min-height:0;
+    padding:0;
+    display:block;
+  }
+  .scrub-section:nth-of-type(odd){background:#000;}
+  .scrub-section:nth-of-type(even){background:#0a0a0c;}
+  .scrub-sticky{
+    position:sticky;
+    top:0;
+    height:100vh;
+    width:100%;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .scrub-text{
+    position:absolute;
+    top:12%;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    z-index:3;
+    width:90%;
+    max-width:700px;
+  }
+  .scrub-text .eyebrow{animation:none;opacity:1;}
+  .scrub-text h2{
+    font-size:clamp(2rem,5vw,3.4rem);
+    font-weight:700;
+    letter-spacing:-.02em;
+    background:linear-gradient(180deg,#fff,#a1a1a6);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .scrub-text p{color:var(--muted);font-size:1.15rem;margin-top:14px;}
+
+  .scrub-graphic{
+    position:absolute;
+    top:56%;left:50%;
+    transform:translate(-50%,-50%);
+    width:min(86vw,720px);
+    height:min(60vw,480px);
+    z-index:2;
+  }
+  .scrub-graphic svg{width:100%;height:100%;display:block;overflow:visible;}
+  .sg-label{
+    font-size:11px;
+    font-weight:600;
+    fill:#86868b;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+  }
+  .sg-box-label{font-size:12px;font-weight:600;fill:#f5f5f7;}
+  .sg-line{stroke:#3a3a3d;stroke-width:2;fill:none;}
+  .sg-line-active{stroke:#2997ff;stroke-width:2;fill:none;}
+  .sg-node{fill:#1d1d1f;stroke:#3a3a3d;stroke-width:2;}
+  .sg-node-alive{fill:#0d2a44;stroke:#2997ff;stroke-width:2;}
+  .sg-node-dead{fill:#3a0d10;stroke:#ff453a;stroke-width:2;}
+  .sg-pulse{fill:none;stroke:#2997ff;stroke-width:2;}
+  .sg-dc-box{fill:#1d1d1f;stroke:#3a3a3d;stroke-width:2;}
+  .sg-dc-box-active{fill:#0d2a44;stroke:#2997ff;stroke-width:2;}
+  .sg-dc-box-dead{fill:#2a0d10;stroke:#ff453a;stroke-width:2;}
+  .sg-repl-dot{fill:#2997ff;}
+
+  /* ABOUT */
+  #about{background:linear-gradient(180deg,#000,#0a0a0c);}
+  .about-text{
+    max-width:760px;
+    font-size:clamp(1.1rem,2.2vw,1.5rem);
+    line-height:1.6;
+    color:#d2d2d7;
+  }
+  .about-text strong{color:#fff;}
+
+  /* EXPERIENCE TIMELINE */
+  #experience{background:#000;text-align:left;align-items:center;}
+  .timeline{
+    width:100%;
+    max-width:840px;
+    position:relative;
+    padding-left:32px;
+    border-left:2px solid rgba(255,255,255,0.15);
+  }
+  .timeline-item{
+    position:relative;
+    margin-bottom:56px;
+    padding-left:24px;
+  }
+  .timeline-item:last-child{margin-bottom:0;}
+  .timeline-item::before{
+    content:'';
+    position:absolute;
+    left:-41px;
+    top:6px;
+    width:14px;height:14px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 4px rgba(41,151,255,0.2);
+  }
+  .timeline-role{font-size:1.4rem;font-weight:700;}
+  .timeline-company{color:var(--accent);font-weight:600;margin-top:2px;}
+  .timeline-date{color:var(--muted);font-size:.9rem;margin-top:2px;margin-bottom:16px;}
+  .timeline-item ul{padding-left:20px;color:#d2d2d7;line-height:1.7;font-size:1rem;}
+  .timeline-item li{margin-bottom:6px;}
+
+  /* SKILLS */
+  #skills{background:linear-gradient(180deg,#0a0a0c,#000);}
+  .skills-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+    width:100%;
+    max-width:1100px;
+    text-align:left;
+  }
+  .skill-card{
+    background:var(--card);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:28px;
+    transition:transform .3s ease, border-color .3s ease;
+  }
+  .skill-card:hover{transform:translateY(-6px);border-color:rgba(41,151,255,0.5);}
+  .skill-card h3{font-size:1.05rem;margin-bottom:12px;color:var(--accent);}
+  .skill-card p{color:#d2d2d7;font-size:.92rem;line-height:1.6;}
+
+  /* ACHIEVEMENTS */
+  #achievements{background:#000;}
+  .achieve-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:24px;
+    width:100%;
+    max-width:1000px;
+  }
+  .achieve-card{
+    background:radial-gradient(circle at top left, #1c1c1e, #000);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:32px 24px;
+    text-align:left;
+    transition:transform .3s ease;
+  }
+  .achieve-card:hover{transform:translateY(-6px);}
+  .achieve-num{font-size:2.4rem;font-weight:700;color:var(--accent);}
+  .achieve-card p{margin-top:8px;color:#d2d2d7;font-size:.95rem;line-height:1.5;}
+
+  /* EDUCATION */
+  #education{background:linear-gradient(180deg,#000,#0a0a0c);}
+  .edu-item{max-width:640px;margin-bottom:24px;}
+  .edu-item h3{font-size:1.3rem;}
+  .edu-item p{color:var(--muted);margin-top:4px;}
+
+  /* CONTACT */
+  #contact{background:#000;}
+  .contact-links{
+    display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:36px;
+  }
+
+  footer{
+    text-align:center;
+    padding:30px;
+    color:var(--muted);
+    font-size:13px;
+    background:#000;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#about">About</a>
+  <a href="#experience">Experience</a>
+  <a href="#skills">Skills</a>
+  <a href="#achievements">Achievements</a>
+  <a href="#education">Education</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<section id="hero">
+  <div class="eyebrow">SENIOR STAFF SOFTWARE ENGINEER</div>
+  <h1 class="hero-title">Abhay Tiwari</h1>
+  <p class="hero-sub">Building reliability into distributed systems at scale.<br>SRE. Kernel-level debugger. AI-driven automation.</p>
+  <div class="hero-cta">
+    <a href="#experience" class="btn btn-primary">View Experience</a>
+    <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+  </div>
+  <div class="scroll-hint">Scroll to explore ↓</div>
+</section>
+
+<!-- Each animation below is fully independent: its own section, its own
+     scroll range, its own progress calculation. Scrolling through one has
+     zero effect on the others. They're interleaved between content
+     sections rather than stacked back-to-back. -->
+
+<section id="about">
+  <div class="reveal">
+    <div class="eyebrow">ABOUT</div>
+    <h2 class="section-title">Reliability is the product.</h2>
+  </div>
+  <p class="about-text reveal">
+    <strong>8+ years</strong> operating large-scale distributed systems and reliability-focused production platforms.
+    Deep expertise in <strong>Python, Linux, Kubernetes</strong>, and kernel-level debugging. I build the automation
+    and AI-driven triage systems that keep enterprise infrastructure running — reducing MTTR, defining SLOs/SLAs,
+    and leading incident response when it matters most.
+  </p>
+</section>
+
+<section class="scrub-section" id="scrub-failover">
+  <div class="scrub-sticky">
+    <div class="scrub-graphic">
+      <svg viewBox="0 0 600 400">
+        <text x="300" y="40" text-anchor="middle" class="sg-label">LOAD BALANCER</text>
+        <rect x="255" y="50" width="90" height="40" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
+        <text x="300" y="75" text-anchor="middle" class="sg-box-label">LB</text>
+
+        <line class="sg-line" x1="300" y1="90" x2="150" y2="220"/>
+        <line class="sg-line" x1="300" y1="90" x2="300" y2="220"/>
+        <line class="sg-line" x1="300" y1="90" x2="450" y2="220"/>
+        <path id="rerouteLine" class="sg-line-active" d="M300,90 C220,140 180,170 155,215" stroke-dasharray="1" stroke-dashoffset="1" fill="none"/>
+
+        <circle class="sg-node-alive" cx="150" cy="240" r="26"/>
+        <text x="150" y="245" text-anchor="middle" class="sg-box-label">OK</text>
+        <text x="150" y="290" text-anchor="middle" class="sg-label">NODE 1</text>
+
+        <circle id="deadNode" class="sg-node-dead" cx="300" cy="240" r="26"/>
+        <line x1="290" y1="230" x2="310" y2="250" stroke="#ff453a" stroke-width="3"/>
+        <line x1="310" y1="230" x2="290" y2="250" stroke="#ff453a" stroke-width="3"/>
+        <text x="300" y="290" text-anchor="middle" class="sg-label">NODE 2</text>
+
+        <circle class="sg-node-alive" cx="450" cy="240" r="26"/>
+        <text x="450" y="245" text-anchor="middle" class="sg-box-label">OK</text>
+        <text x="450" y="290" text-anchor="middle" class="sg-label">NODE 3</text>
+
+        <circle id="rerouteDot" r="6" fill="#2997ff"/>
+      </svg>
+    </div>
+    <div class="scrub-text">
+      <div class="eyebrow">RESILIENCE</div>
+      <h2>A single node fails.</h2>
+      <p>The load balancer reroutes traffic instantly — the system doesn't even blink.</p>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="reveal" style="text-align:center;width:100%;">
+    <div class="eyebrow">EXPERIENCE</div>
+    <h2 class="section-title">Where I've built.</h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div class="timeline-role">Senior Staff Software Engineer</div>
+      <div class="timeline-company">Druva Data Solutions</div>
+      <div class="timeline-date">02/2026 — Present</div>
+      <ul>
+        <li>Built an AI-driven triage system reducing manual debugging effort by ~40% across production environments.</li>
+        <li>Improved reliability of data protection systems using proactive monitoring and automated diagnostic workflows.</li>
+        <li>Debugged backup systems handling enterprise-scale SQL and file system workloads across multi-node clusters.</li>
+        <li>Defined SLOs and improved availability for critical large-scale data protection infrastructure services.</li>
+        <li>Handled P0/P1 incidents during on-call rotations across distributed production environments.</li>
+      </ul>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-role">Senior Software Engineer / Platform Reliability Engineer</div>
+      <div class="timeline-company">CSG (formerly Veritas)</div>
+      <div class="timeline-date">10/2017 — 01/2026</div>
+      <ul>
+        <li>Built an anomaly detection platform reducing MTTR by ~30% across large-scale distributed storage clusters.</li>
+        <li>Owned SLOs and SLAs ensuring high availability for globally distributed enterprise storage systems.</li>
+        <li>Led P0/P1 incident response, coordinating cross-team debugging during critical production outages.</li>
+        <li>Automated diagnostics and log analysis workflows, cutting manual troubleshooting effort by 35%.</li>
+        <li>Developed predictive models detecting performance degradation across enterprise multi-node clusters.</li>
+        <li>Debugged geo-distributed replication clusters, improving system stability and fault tolerance.</li>
+        <li>Used perf, strace, ftrace, tcpdump, and vmstat for deep Linux kernel-level debugging.</li>
+        <li>Supported large-scale clusters exceeding 100 nodes handling high-throughput production workloads.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="scrub-section" id="scrub-observability">
+  <div class="scrub-sticky">
+    <div class="scrub-graphic">
+      <svg viewBox="0 0 600 400">
+        <text x="300" y="30" text-anchor="middle" class="sg-label">OBSERVABILITY</text>
+        <rect x="255" y="40" width="90" height="40" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
+        <text x="300" y="65" text-anchor="middle" class="sg-box-label">MON</text>
+
+        <g id="radarRings"></g>
+
+        <line class="sg-line" x1="300" y1="80" x2="120" y2="200"/>
+        <line class="sg-line" x1="300" y1="80" x2="220" y2="230"/>
+        <line class="sg-line" x1="300" y1="80" x2="320" y2="230"/>
+        <line class="sg-line" x1="300" y1="80" x2="420" y2="200"/>
+        <line class="sg-line" x1="300" y1="80" x2="480" y2="260"/>
+        <line class="sg-line" x1="300" y1="80" x2="90" y2="270"/>
+
+        <g id="watchedNodes">
+          <circle class="sg-node" cx="120" cy="215" r="20" data-r="152"/>
+          <circle class="sg-node" cx="220" cy="245" r="20" data-r="180"/>
+          <circle class="sg-node" cx="320" cy="245" r="20" data-r="168"/>
+          <circle class="sg-node" cx="420" cy="215" r="20" data-r="167"/>
+          <circle class="sg-node" cx="480" cy="275" r="20" data-r="234"/>
+          <circle class="sg-node" cx="90" cy="285" r="20" data-r="271"/>
+        </g>
+        <text x="300" y="360" text-anchor="middle" class="sg-label">ANOMALY DETECTION SWEEP</text>
+      </svg>
+    </div>
+    <div class="scrub-text">
+      <div class="eyebrow">MONITORING</div>
+      <h2>Every node, watched.</h2>
+      <p>Anomaly detection sweeps the cluster, catching degradation before users ever notice.</p>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="reveal" style="text-align:center;">
+    <div class="eyebrow">SKILLS</div>
+    <h2 class="section-title">The toolkit.</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Languages, systems, and tools I use to keep production reliable.</p>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="skill-card"><h3>Languages & Systems</h3><p>Python, Go, Bash, C, Linux</p></div>
+    <div class="skill-card"><h3>Distributed Systems & SRE</h3><p>Distributed Systems, Reliability Engineering, High Availability, SLO/SLA Management</p></div>
+    <div class="skill-card"><h3>Storage & Data Systems</h3><p>Backup & Recovery, Distributed Storage, MSSQL, Data Protection Platforms</p></div>
+    <div class="skill-card"><h3>Containerization</h3><p>Kubernetes, Docker</p></div>
+    <div class="skill-card"><h3>Cloud & Infrastructure</h3><p>AWS, Infrastructure Automation, Cloud-Based Distributed Systems</p></div>
+    <div class="skill-card"><h3>Observability</h3><p>Prometheus, Grafana, Coralogix, Distributed Tracing, Alerting Systems</p></div>
+    <div class="skill-card"><h3>CI/CD & Automation</h3><p>Jenkins, Git, CI/CD Pipelines, Cursor (AI-assisted development)</p></div>
+    <div class="skill-card"><h3>Debugging & Diagnostics</h3><p>Production Debugging, Root Cause Analysis, Log Analysis, Kernel Debugging</p></div>
+    <div class="skill-card"><h3>Linux Performance Tools</h3><p>perf, strace, ftrace, tcpdump, iostat, vmstat</p></div>
+  </div>
+</section>
+
+<section class="scrub-section" id="scrub-cluster">
+  <div class="scrub-sticky">
+    <div class="scrub-graphic">
+      <svg viewBox="0 0 600 400">
+        <text x="300" y="30" text-anchor="middle" class="sg-label">DISTRIBUTED CLUSTER — 100+ NODES</text>
+        <g id="clusterGrid"></g>
+        <path id="heartbeatPath" class="sg-pulse" d="M40,360 L180,360 L200,320 L220,380 L245,340 L265,360 L560,360" stroke-dasharray="1" stroke-dashoffset="1"/>
+        <text x="300" y="390" text-anchor="middle" class="sg-label">ONE HEARTBEAT, GLOBALLY SYNCED</text>
+      </svg>
+    </div>
+    <div class="scrub-text">
+      <div class="eyebrow">SCALE</div>
+      <h2>100+ nodes, one heartbeat.</h2>
+      <p>Reliability engineered at scale, across geo-distributed clusters.</p>
+    </div>
+  </div>
+</section>
+
+<section id="achievements">
+  <div class="reveal" style="text-align:center;">
+    <div class="eyebrow">ACHIEVEMENTS</div>
+    <h2 class="section-title">Impact, measured.</h2>
+  </div>
+  <div class="achieve-grid reveal">
+    <div class="achieve-card"><div class="achieve-num">50%</div><p>Reduced kernel qualification time through CI/CD automation and workflow optimization.</p></div>
+    <div class="achieve-card"><div class="achieve-num">30%</div><p>MTTR reduction via anomaly detection platform across enterprise-scale storage systems.</p></div>
+    <div class="achieve-card"><div class="achieve-num">40%</div><p>Manual debugging effort cut with an AI-driven triage system for production environments.</p></div>
+    <div class="achieve-card"><div class="achieve-num">100+</div><p>Node clusters supported reliably at high-throughput enterprise production scale.</p></div>
+    <div class="achieve-card"><div class="achieve-num">Kernel</div><p>Identified and contributed to resolving a critical Red Hat kernel concurrent locking issue.</p></div>
+  </div>
+</section>
+
+<section class="scrub-section" id="scrub-vvr">
+  <div class="scrub-sticky">
+    <div class="scrub-graphic">
+      <svg viewBox="0 0 600 400">
+        <text x="300" y="26" text-anchor="middle" class="sg-label">VVR — VOLUME REPLICATOR</text>
+
+        <!-- App / client -->
+        <rect x="255" y="40" width="90" height="34" rx="8" fill="#1d1d1f" stroke="#3a3a3d" stroke-width="2"/>
+        <text x="300" y="62" text-anchor="middle" class="sg-box-label">CLIENT APP</text>
+
+        <path id="vvrClientPrimary" class="sg-line-active" d="M270,74 C230,110 170,120 150,138" stroke-dasharray="1" stroke-dashoffset="0" fill="none"/>
+        <path id="vvrClientDR" class="sg-line" d="M330,74 C400,110 440,120 450,138" stroke-dasharray="1" stroke-dashoffset="1" fill="none"/>
+
+        <!-- Primary DC -->
+        <rect id="primaryBox" class="sg-dc-box-active" x="60" y="140" width="180" height="110" rx="10"/>
+        <text id="primaryLabel" x="150" y="168" text-anchor="middle" class="sg-box-label">PRIMARY DC</text>
+        <line x1="90" y1="185" x2="210" y2="185" stroke="#2997ff" stroke-width="2" opacity="0.5"/>
+        <line x1="90" y1="200" x2="210" y2="200" stroke="#2997ff" stroke-width="2" opacity="0.5"/>
+        <line x1="90" y1="215" x2="210" y2="215" stroke="#2997ff" stroke-width="2" opacity="0.5"/>
+        <text x="150" y="240" text-anchor="middle" class="sg-label">VOLUME (RVG)</text>
+        <g id="primaryFail" opacity="0">
+          <line x1="120" y1="170" x2="180" y2="230" stroke="#ff453a" stroke-width="4"/>
+          <line x1="180" y1="170" x2="120" y2="230" stroke="#ff453a" stroke-width="4"/>
+        </g>
+
+        <!-- Replication link -->
+        <line class="sg-line" x1="240" y1="195" x2="360" y2="195"/>
+        <text x="300" y="180" text-anchor="middle" class="sg-label" id="replLabel">REPLICATING</text>
+        <g id="replDots"></g>
+
+        <!-- DR DC -->
+        <rect id="drBox" class="sg-dc-box" x="360" y="140" width="180" height="110" rx="10"/>
+        <text id="drLabel" x="450" y="168" text-anchor="middle" class="sg-box-label">DR SITE</text>
+        <line x1="390" y1="185" x2="510" y2="185" stroke="#3a3a3d" stroke-width="2" opacity="0.5"/>
+        <line x1="390" y1="200" x2="510" y2="200" stroke="#3a3a3d" stroke-width="2" opacity="0.5"/>
+        <line x1="390" y1="215" x2="510" y2="215" stroke="#3a3a3d" stroke-width="2" opacity="0.5"/>
+        <text x="450" y="240" text-anchor="middle" class="sg-label">VOLUME (RVG)</text>
+
+        <text x="300" y="380" text-anchor="middle" class="sg-label" id="vvrStatusLabel">CONTINUOUS ASYNCHRONOUS REPLICATION</text>
+      </svg>
+    </div>
+    <div class="scrub-text">
+      <div class="eyebrow">DISASTER RECOVERY</div>
+      <h2>Site down. Zero data left behind.</h2>
+      <p>VVR replicates every write to the DR site in real time — when the primary goes dark, DR promotes and takes over.</p>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="reveal" style="text-align:center;">
+    <div class="eyebrow">EDUCATION</div>
+    <h2 class="section-title">Foundations.</h2>
+  </div>
+  <div class="reveal">
+    <div class="edu-item">
+      <h3>Post Graduate Diploma in Advanced Computing (PG-DAC)</h3>
+      <p>CDAC ACTS, Pune — 03/2017</p>
+    </div>
+    <div class="edu-item">
+      <h3>Bachelor of Technology</h3>
+      <p>Uttarakhand Technical University — 07/2014</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="reveal" style="text-align:center;">
+    <div class="eyebrow">CONTACT</div>
+    <h2 class="section-title">Let's talk.</h2>
+    <p class="section-sub" style="margin-left:auto;margin-right:auto;">Open to relocation. Open to conversations about reliability, distributed systems, and hard debugging problems.</p>
+    <div class="contact-links">
+      <a href="mailto:iabhaytiiwari@gmail.com" class="btn btn-primary">Email Me</a>
+      <a href="tel:+919168771769" class="btn btn-secondary">+91 9168771769</a>
+      <a href="https://www.linkedin.com/in/abhay-tiwari" target="_blank" class="btn btn-secondary">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Abhay Tiwari. Built with care.</footer>
+
+<script>
+  // Nav hide on scroll down, show on scroll up
+  let lastScroll = 0;
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    const cur = window.scrollY;
+    if (cur > lastScroll && cur > 120) nav.classList.add('hide');
+    else nav.classList.remove('hide');
+    lastScroll = cur;
+  });
+
+  // Segregated scroll-scrubbed sections: each animation lives in its own
+  // pinned section with its own local scroll progress (0-1). They are
+  // completely independent — scrolling through one never affects another.
+  function registerScrub(sectionId, onProgress) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    function update() {
+      const rect = section.getBoundingClientRect();
+      const total = section.offsetHeight - window.innerHeight;
+      let progress = -rect.top / total;
+      progress = Math.max(0, Math.min(1, progress));
+      onProgress(progress);
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
+  // --- 1. Failover diagram ---
+  (function () {
+    const rerouteLine = document.getElementById('rerouteLine');
+    const rerouteDot = document.getElementById('rerouteDot');
+    const rerouteLen = rerouteLine.getTotalLength();
+    rerouteLine.setAttribute('stroke-dasharray', rerouteLen);
+
+    registerScrub('scrub-failover', (p) => {
+      rerouteLine.setAttribute('stroke-dashoffset', rerouteLen * (1 - p));
+      const pt = rerouteLine.getPointAtLength(rerouteLen * p);
+      rerouteDot.setAttribute('cx', pt.x);
+      rerouteDot.setAttribute('cy', pt.y);
+      rerouteDot.style.opacity = p > 0.02 ? 1 : 0;
+    });
+  })();
+
+  // --- 2. Observability radar sweep ---
+  (function () {
+    const radarRingsGroup = document.getElementById('radarRings');
+    const watchedNodes = document.querySelectorAll('#watchedNodes .sg-node');
+
+    registerScrub('scrub-observability', (p) => {
+      const maxR = 260;
+      const ringR = p * maxR;
+      radarRingsGroup.innerHTML = `<circle cx="300" cy="80" r="${ringR}" fill="none" stroke="#2997ff" stroke-width="2" opacity="${Math.max(0, 0.6 - p * 0.5)}"/>`;
+      watchedNodes.forEach(n => {
+        const nodeR = parseFloat(n.getAttribute('data-r'));
+        n.setAttribute('class', ringR >= nodeR ? 'sg-node-alive' : 'sg-node');
+      });
+    });
+  })();
+
+  // --- 3. 100+ node cluster heartbeat ---
+  (function () {
+    const clusterGrid = document.getElementById('clusterGrid');
+    const clusterNodes = [];
+    const COLS = 14, ROWS = 5;
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cx = 60 + c * (480 / (COLS - 1));
+        const cy = 70 + r * 45;
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', cx);
+        dot.setAttribute('cy', cy);
+        dot.setAttribute('r', 6);
+        dot.setAttribute('class', 'sg-node');
+        clusterGrid.appendChild(dot);
+        clusterNodes.push(dot);
+      }
+    }
+    const heartbeatPath = document.getElementById('heartbeatPath');
+    const heartbeatLen = heartbeatPath.getTotalLength();
+    heartbeatPath.setAttribute('stroke-dasharray', heartbeatLen);
+
+    registerScrub('scrub-cluster', (p) => {
+      heartbeatPath.setAttribute('stroke-dashoffset', heartbeatLen * (1 - p));
+      const activeCount = Math.floor(p * clusterNodes.length);
+      clusterNodes.forEach((n, i) => {
+        n.setAttribute('class', i < activeCount ? 'sg-node-alive' : 'sg-node');
+      });
+    });
+  })();
+
+  // --- 4. VVR Disaster Recovery: replicate -> primary fails -> DR promotes ---
+  (function () {
+    const primaryBox = document.getElementById('primaryBox');
+    const primaryLabel = document.getElementById('primaryLabel');
+    const primaryFail = document.getElementById('primaryFail');
+    const drBox = document.getElementById('drBox');
+    const drLabel = document.getElementById('drLabel');
+    const replLabel = document.getElementById('replLabel');
+    const replDotsGroup = document.getElementById('replDots');
+    const statusLabel = document.getElementById('vvrStatusLabel');
+    const clientPrimary = document.getElementById('vvrClientPrimary');
+    const clientDR = document.getElementById('vvrClientDR');
+
+    const cpLen = clientPrimary.getTotalLength();
+    clientPrimary.setAttribute('stroke-dasharray', cpLen);
+    const cdLen = clientDR.getTotalLength();
+    clientDR.setAttribute('stroke-dasharray', cdLen);
+
+    // Build a handful of replication dots that flow left -> right while active
+    const DOT_COUNT = 4;
+    const dots = [];
+    for (let i = 0; i < DOT_COUNT; i++) {
+      const d = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      d.setAttribute('r', 4);
+      d.setAttribute('class', 'sg-repl-dot');
+      replDotsGroup.appendChild(d);
+      dots.push(d);
+    }
+
+    registerScrub('scrub-vvr', (p) => {
+      // Phase A (0 - 0.45): steady replication, client talks to primary
+      // Phase B (0.45 - 0.65): primary fails
+      // Phase C (0.65 - 1.0): DR promotes, client redirects to DR
+
+      const replActive = p < 0.5;
+      replDotsGroup.style.opacity = replActive ? 1 : 0.15;
+      dots.forEach((d, i) => {
+        const t = (p * 2.2 + i / DOT_COUNT) % 1;
+        d.setAttribute('cx', 240 + t * 120);
+        d.setAttribute('cy', 195);
+      });
+      replLabel.textContent = replActive ? 'REPLICATING' : 'REPLICATION PAUSED';
+
+      // client -> primary line: fully drawn until failure begins, then retracts
+      const cpProgress = Math.max(0, Math.min(1, 1 - (p - 0.4) / 0.2));
+      clientPrimary.setAttribute('stroke-dashoffset', cpLen * (1 - Math.min(1, cpProgress)));
+      clientPrimary.style.opacity = cpProgress;
+
+      // primary failure X fades in between 0.45 - 0.65
+      const failT = Math.max(0, Math.min(1, (p - 0.45) / 0.2));
+      primaryFail.style.opacity = failT;
+      primaryBox.setAttribute('class', failT > 0.5 ? 'sg-dc-box-dead' : 'sg-dc-box-active');
+      primaryLabel.textContent = failT > 0.5 ? 'PRIMARY DC — DOWN' : 'PRIMARY DC';
+
+      // DR promotion: box lights up, client line draws in from 0.6 - 1.0
+      const promoteT = Math.max(0, Math.min(1, (p - 0.6) / 0.4));
+      drBox.setAttribute('class', promoteT > 0.3 ? 'sg-dc-box-active' : 'sg-dc-box');
+      drLabel.textContent = promoteT > 0.3 ? 'DR SITE — PROMOTED' : 'DR SITE';
+      clientDR.setAttribute('stroke-dashoffset', cdLen * (1 - promoteT));
+      clientDR.style.opacity = promoteT;
+
+      if (p < 0.45) statusLabel.textContent = 'CONTINUOUS ASYNCHRONOUS REPLICATION';
+      else if (p < 0.65) statusLabel.textContent = 'PRIMARY SITE FAILURE DETECTED';
+      else statusLabel.textContent = 'DR SITE ACTIVE — NEAR-ZERO RPO FAILOVER';
+    });
+  })();
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

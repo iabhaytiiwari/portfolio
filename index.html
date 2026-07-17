@@ -11,7 +11,11 @@
     --fg:#f5f5f7;
     --muted:#86868b;
     --accent:#2997ff;
+    --accent2:#ff5da2;
+    --accent3:#22d3ee;
+    --accent4:#a855f7;
     --card:#1d1d1f;
+    --grad: linear-gradient(120deg, var(--accent2), var(--accent), var(--accent3));
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -132,11 +136,16 @@
   .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease, transform .8s ease;}
   .reveal.visible{opacity:1;transform:translateY(0);}
 
-  /* SCROLL-SCRUBBED SECTIONS — each animation is fully segregated: its own
-     pinned section, its own scroll range, its own progress calculation. */
+  /* SCROLL-SCRUBBED SECTIONS — apple.com/macbook-pro style: each section is
+     a tall track with a position:sticky inner stage. As you scroll, the
+     stage stays pinned to the viewport (it looks "stuck") while scroll
+     position drives the animation forward; only once you've scrolled the
+     entire track does the page release and continue. Scrolling up plays
+     it backward the same way. No scroll-jacking/preventDefault involved —
+     this is the real mechanism apple.com uses. */
   .scrub-section{
     position:relative;
-    height:220vh;
+    height:420vh;
     min-height:0;
     padding:0;
     display:block;
@@ -162,6 +171,7 @@
     z-index:3;
     width:90%;
     max-width:700px;
+    transition:opacity .15s linear, transform .15s linear;
   }
   .scrub-text .eyebrow{animation:none;opacity:1;}
   .scrub-text h2{
@@ -231,16 +241,68 @@
     position:absolute;
     left:-41px;
     top:6px;
-    width:14px;height:14px;
+    width:10px;height:10px;
     border-radius:50%;
-    background:var(--accent);
-    box-shadow:0 0 0 4px rgba(41,151,255,0.2);
+    background:#3a3a3d;
+  }
+  .timeline-runner{
+    position:absolute;
+    left:-46px;
+    top:0;
+    width:18px;height:18px;
+    border-radius:50%;
+    background:var(--grad);
+    box-shadow:0 0 12px rgba(255,93,162,0.7), 0 0 24px rgba(34,211,238,0.5);
+    transition:top .05s linear;
+    z-index:2;
   }
   .timeline-role{font-size:1.4rem;font-weight:700;}
   .timeline-company{color:var(--accent);font-weight:600;margin-top:2px;}
   .timeline-date{color:var(--muted);font-size:.9rem;margin-top:2px;margin-bottom:16px;}
   .timeline-item ul{padding-left:20px;color:#d2d2d7;line-height:1.7;font-size:1rem;}
   .timeline-item li{margin-bottom:6px;}
+
+  /* TECH STACK MARQUEE — infinite-scrolling row of icon badges */
+  .tech-marquee{
+    width:100%;
+    max-width:1000px;
+    overflow:hidden;
+    margin:0 auto 48px;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .tech-track{
+    display:flex;
+    gap:56px;
+    width:max-content;
+    animation:techScroll 16s linear infinite;
+  }
+  .tech-marquee:hover .tech-track{animation-play-state:paused;}
+  @keyframes techScroll{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+  .tech-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    opacity:0.85;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .tech-item:hover{opacity:1;transform:translateY(-4px);}
+  .tech-icon{
+    width:48px;height:48px;
+    filter:drop-shadow(0 0 10px rgba(41,151,255,0.25));
+  }
+  .tech-item span{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+    color:var(--muted);
+    white-space:nowrap;
+  }
 
   /* SKILLS */
   #skills{background:linear-gradient(180deg,#0a0a0c,#000);}
@@ -304,9 +366,248 @@
     background:#000;
     border-top:1px solid rgba(255,255,255,0.08);
   }
+
+  /* ============================================================
+     CREATIVE THEME LAYER — bolder color, custom cursor, texture,
+     glassy cards, gradient accents. Purely visual; content/animation
+     logic elsewhere is untouched.
+     ============================================================ */
+
+  /* grain texture overlay for depth */
+  body::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    pointer-events:none;
+    opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* custom cursor (desktop only) */
+  @media (pointer:fine){
+    body{cursor:none;}
+    #cursorDot, #cursorRing{
+      position:fixed;
+      top:0;left:0;
+      border-radius:50%;
+      pointer-events:none;
+      z-index:9999;
+      transform:translate(-50%,-50%);
+      mix-blend-mode:difference;
+    }
+    #cursorDot{
+      width:8px;height:8px;
+      background:#fff;
+      transition:transform .1s ease;
+    }
+    #cursorRing{
+      width:34px;height:34px;
+      border:1.5px solid var(--accent2);
+      background:transparent;
+      transition:transform .18s ease, width .2s ease, height .2s ease, border-color .2s ease;
+    }
+    #cursorRing.grow{width:60px;height:60px;border-color:var(--accent3);}
+  }
+
+  /* ambient gradient blobs behind hero */
+  .blob-field{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    z-index:0;
+    pointer-events:none;
+  }
+  .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+    opacity:0.55;
+    animation:blobDrift 18s ease-in-out infinite alternate;
+  }
+  .blob1{width:420px;height:420px;background:var(--accent4);top:-10%;left:-5%;}
+  .blob2{width:360px;height:360px;background:var(--accent2);bottom:-15%;right:-5%;animation-delay:2s;}
+  .blob3{width:300px;height:300px;background:var(--accent3);top:40%;left:60%;animation-delay:4s;}
+  @keyframes blobDrift{
+    0%{transform:translate(0,0) scale(1);}
+    100%{transform:translate(40px,-30px) scale(1.15);}
+  }
+  #hero .eyebrow, #hero .hero-title, #hero .hero-sub, #hero .hero-cta, #hero .scroll-hint{position:relative;z-index:1;}
+
+  /* nav: floating gradient-bordered pill */
+  nav{
+    top:16px;left:50%;right:auto;
+    transform:translateX(-50%);
+    width:max-content;
+    border-radius:100px;
+    background:rgba(10,10,14,0.6);
+    border:1px solid transparent;
+    background-image:linear-gradient(rgba(10,10,14,0.75),rgba(10,10,14,0.75)), var(--grad);
+    background-origin:border-box;
+    background-clip:padding-box, border-box;
+    box-shadow:0 8px 30px rgba(0,0,0,0.5);
+  }
+  nav.hide{transform:translateX(-50%) translateY(-140%);}
+
+  /* gradient headline text everywhere */
+  .hero-title{
+    background:var(--grad);
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:fadeUp 1s ease forwards .4s, gradientShift 6s linear infinite;
+  }
+  @keyframes gradientShift{
+    0%{background-position:0% 50%;}
+    100%{background-position:200% 50%;}
+  }
+  .section-title, .scrub-text h2{
+    background:var(--grad);
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+
+  /* gradient buttons with glow */
+  .btn-primary{
+    background:var(--grad);
+    background-size:200% auto;
+    color:#000;
+    box-shadow:0 0 24px rgba(255,93,162,0.35);
+  }
+  .btn-primary:hover{background-position:100% 0;box-shadow:0 0 34px rgba(34,211,238,0.5);}
+  .btn-secondary{
+    border:1px solid rgba(255,255,255,0.25);
+    background:rgba(255,255,255,0.03);
+    backdrop-filter:blur(6px);
+  }
+  .btn-secondary:hover{border-color:var(--accent3);box-shadow:0 0 20px rgba(34,211,238,0.25);}
+
+  /* glassy skill cards with color-shift border on hover */
+  .skill-card{
+    background:linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    backdrop-filter:blur(10px);
+    position:relative;
+    overflow:hidden;
+  }
+  .skill-card::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    padding:1px;
+    border-radius:18px;
+    background:var(--grad);
+    opacity:0;
+    transition:opacity .3s ease;
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    pointer-events:none;
+  }
+  .skill-card:hover{transform:translateY(-8px) rotate(-0.5deg);border-color:transparent;}
+  .skill-card:hover::before{opacity:1;}
+  .skill-card h3{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+  /* achievement numbers: bold gradient, diagonal accent */
+  .achieve-card{
+    position:relative;
+    background:linear-gradient(160deg, rgba(255,255,255,0.05), rgba(0,0,0,0));
+    overflow:hidden;
+  }
+  .achieve-card::after{
+    content:'';
+    position:absolute;
+    top:-40%;right:-20%;
+    width:140px;height:220px;
+    background:var(--grad);
+    opacity:0.12;
+    transform:rotate(20deg);
+  }
+  .achieve-num{
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-size:3rem;
+  }
+
+  /* timeline: subtle gradient rail, static markers dim until the runner
+     ball passes them, then they light up and stay lit */
+  .timeline{border-left:2px solid transparent;border-image:var(--grad) 1;}
+  .timeline-item::before{transition:background .3s ease, box-shadow .3s ease;}
+  .timeline-item.passed::before{
+    background:var(--grad);
+    box-shadow:0 0 0 5px rgba(168,85,247,0.15), 0 0 16px rgba(255,93,162,0.6);
+  }
+  .timeline-company{
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+
+  /* eyebrow text gets a gradient too */
+  .eyebrow{
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+
+  /* section accent divider under headings */
+  .section-title::after{
+    content:'';
+    display:block;
+    width:64px;height:4px;
+    margin:18px auto 0;
+    background:var(--grad);
+    border-radius:4px;
+  }
+
+  a:not(.btn):hover{color:var(--accent3);}
+
+  /* ============================================================
+     LIVING BACKGROUNDS — every major section gets its own ambient
+     ,blob field (like apple.com), dormant until the section scrolls
+     into view, then it fades and blooms to life.
+     ============================================================ */
+  /* NOTE: deliberately NOT setting overflow:hidden on `section` — it's a
+     classic trap that silently breaks position:sticky on any descendant
+     (including the diagram stages below), because overflow != visible on
+     an ancestor makes that ancestor the sticky containing block instead
+     of the viewport. The .blob-field already clips its own blobs via its
+     own overflow:hidden, so section-level clipping isn't needed anyway. */
+  .blob-field.section-blobs{
+    opacity:0;
+    transform:scale(0.75);
+    transition:opacity 1.4s cubic-bezier(.16,1,.3,1), transform 1.6s cubic-bezier(.16,1,.3,1);
+  }
+  .blob-field.section-blobs.in-view{
+    opacity:1;
+    transform:scale(1);
+  }
+  #hero .blob-field{opacity:1;transform:scale(1);} /* hero blobs always alive */
+  .blob-sm{width:280px;height:280px;}
+
+  /* richer reveal: blur + rise + scale instead of plain fade */
+  .reveal{
+    opacity:0;
+    transform:translateY(50px) scale(0.96);
+    filter:blur(6px);
+    transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s ease;
+  }
+  .reveal.visible{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+  }
+
+  /* subtle 3D depth for pinned diagrams as they enter/leave focus */
+  .scrub-sticky{perspective:1400px;}
+  .scrub-graphic{transition:transform .1s linear;transform-style:preserve-3d;}
+
+  /* keep real content painted above the ambient blob layer */
+  section > .reveal, section > .timeline, section > .contact-links{
+    position:relative;z-index:1;
+  }
 </style>
 </head>
 <body>
+
+<div id="cursorRing"></div>
+<div id="cursorDot"></div>
 
 <nav id="nav">
   <a href="#about">About</a>
@@ -318,6 +619,11 @@
 </nav>
 
 <section id="hero">
+  <div class="blob-field">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+  </div>
   <div class="eyebrow">SENIOR STAFF SOFTWARE ENGINEER</div>
   <h1 class="hero-title">Abhay Tiwari</h1>
   <p class="hero-sub">Building reliability into distributed systems at scale.<br>SRE. Kernel-level debugger. AI-driven automation.</p>
@@ -334,6 +640,10 @@
      sections rather than stacked back-to-back. -->
 
 <section id="about">
+  <div class="blob-field section-blobs">
+    <div class="blob blob-sm" style="background:var(--accent4);top:10%;left:5%;"></div>
+    <div class="blob blob-sm" style="background:var(--accent);bottom:5%;right:8%;animation-delay:1.5s;"></div>
+  </div>
   <div class="reveal">
     <div class="eyebrow">ABOUT</div>
     <h2 class="section-title">Reliability is the product.</h2>
@@ -350,29 +660,52 @@
   <div class="scrub-sticky">
     <div class="scrub-graphic">
       <svg viewBox="0 0 600 400">
-        <text x="300" y="40" text-anchor="middle" class="sg-label">LOAD BALANCER</text>
-        <rect x="255" y="50" width="90" height="40" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
-        <text x="300" y="75" text-anchor="middle" class="sg-box-label">LB</text>
+        <text x="300" y="20" text-anchor="middle" class="sg-label">CLIENT TRAFFIC</text>
+        <rect x="260" y="26" width="80" height="30" rx="8" fill="#1d1d1f" stroke="#3a3a3d" stroke-width="2"/>
+        <text x="300" y="46" text-anchor="middle" class="sg-box-label">CLIENT</text>
 
-        <line class="sg-line" x1="300" y1="90" x2="150" y2="220"/>
-        <line class="sg-line" x1="300" y1="90" x2="300" y2="220"/>
-        <line class="sg-line" x1="300" y1="90" x2="450" y2="220"/>
-        <path id="rerouteLine" class="sg-line-active" d="M300,90 C220,140 180,170 155,215" stroke-dasharray="1" stroke-dashoffset="1" fill="none"/>
+        <line class="sg-line" x1="300" y1="56" x2="300" y2="82"/>
+        <rect x="255" y="84" width="90" height="36" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
+        <text x="300" y="106" text-anchor="middle" class="sg-box-label">LB</text>
 
-        <circle class="sg-node-alive" cx="150" cy="240" r="26"/>
-        <text x="150" y="245" text-anchor="middle" class="sg-box-label">OK</text>
-        <text x="150" y="290" text-anchor="middle" class="sg-label">NODE 1</text>
+        <!-- LB to app tier -->
+        <line class="sg-line" x1="300" y1="120" x2="120" y2="175"/>
+        <line class="sg-line" x1="300" y1="120" x2="300" y2="175"/>
+        <line class="sg-line" x1="300" y1="120" x2="480" y2="175"/>
+        <path id="rerouteLine" class="sg-line-active" d="M300,120 C220,150 160,155 122,172" stroke-dasharray="1" stroke-dashoffset="1" fill="none"/>
 
-        <circle id="deadNode" class="sg-node-dead" cx="300" cy="240" r="26"/>
-        <line x1="290" y1="230" x2="310" y2="250" stroke="#ff453a" stroke-width="3"/>
-        <line x1="310" y1="230" x2="290" y2="250" stroke="#ff453a" stroke-width="3"/>
-        <text x="300" y="290" text-anchor="middle" class="sg-label">NODE 2</text>
+        <!-- App tier -->
+        <rect class="sg-dc-box-active" x="72" y="178" width="96" height="46" rx="8"/>
+        <text x="120" y="197" text-anchor="middle" class="sg-box-label">APP 1</text>
+        <text x="120" y="212" text-anchor="middle" class="sg-label" fill="#22d3ee">OK</text>
 
-        <circle class="sg-node-alive" cx="450" cy="240" r="26"/>
-        <text x="450" y="245" text-anchor="middle" class="sg-box-label">OK</text>
-        <text x="450" y="290" text-anchor="middle" class="sg-label">NODE 3</text>
+        <rect id="deadApp" class="sg-dc-box-dead" x="252" y="178" width="96" height="46" rx="8"/>
+        <text x="300" y="197" text-anchor="middle" class="sg-box-label">APP 2</text>
+        <line x1="288" y1="204" x2="312" y2="220" stroke="#ff453a" stroke-width="3"/>
+        <line x1="312" y1="204" x2="288" y2="220" stroke="#ff453a" stroke-width="3"/>
+
+        <rect class="sg-dc-box-active" x="432" y="178" width="96" height="46" rx="8"/>
+        <text x="480" y="197" text-anchor="middle" class="sg-box-label">APP 3</text>
+        <text x="480" y="212" text-anchor="middle" class="sg-label" fill="#22d3ee">OK</text>
+
+        <!-- App tier to DB tier -->
+        <line class="sg-line" x1="120" y1="224" x2="230" y2="280"/>
+        <line class="sg-line" x1="480" y1="224" x2="370" y2="280"/>
+
+        <!-- DB tier -->
+        <rect class="sg-dc-box-active" x="170" y="282" width="120" height="50" rx="8"/>
+        <text x="230" y="303" text-anchor="middle" class="sg-box-label">DB PRIMARY</text>
+        <text x="230" y="320" text-anchor="middle" class="sg-label">RVG SOURCE</text>
+
+        <rect class="sg-dc-box" x="310" y="282" width="120" height="50" rx="8"/>
+        <text x="370" y="303" text-anchor="middle" class="sg-box-label">DB REPLICA</text>
+        <text x="370" y="320" text-anchor="middle" class="sg-label">STANDBY</text>
+
+        <line class="sg-line" x1="290" y1="307" x2="310" y2="307"/>
+        <circle id="dbSyncDot" r="4" fill="#2997ff"/>
 
         <circle id="rerouteDot" r="6" fill="#2997ff"/>
+        <text x="300" y="368" text-anchor="middle" class="sg-label" id="failoverStatusLabel">ALL APP NODES HEALTHY</text>
       </svg>
     </div>
     <div class="scrub-text">
@@ -384,11 +717,16 @@
 </section>
 
 <section id="experience">
+  <div class="blob-field section-blobs">
+    <div class="blob blob-sm" style="background:var(--accent2);top:8%;right:10%;"></div>
+    <div class="blob blob-sm" style="background:var(--accent3);bottom:8%;left:6%;animation-delay:1s;"></div>
+  </div>
   <div class="reveal" style="text-align:center;width:100%;">
     <div class="eyebrow">EXPERIENCE</div>
     <h2 class="section-title">Where I've built.</h2>
   </div>
-  <div class="timeline">
+  <div class="timeline" id="timeline">
+    <div class="timeline-runner" id="timelineRunner"></div>
     <div class="timeline-item reveal">
       <div class="timeline-role">Senior Staff Software Engineer</div>
       <div class="timeline-company">Druva Data Solutions</div>
@@ -423,28 +761,36 @@
   <div class="scrub-sticky">
     <div class="scrub-graphic">
       <svg viewBox="0 0 600 400">
-        <text x="300" y="30" text-anchor="middle" class="sg-label">OBSERVABILITY</text>
-        <rect x="255" y="40" width="90" height="40" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
-        <text x="300" y="65" text-anchor="middle" class="sg-box-label">MON</text>
+        <text x="300" y="18" text-anchor="middle" class="sg-label">OBSERVABILITY PIPELINE</text>
+        <rect x="255" y="24" width="90" height="34" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
+        <text x="300" y="46" text-anchor="middle" class="sg-box-label">MONITOR</text>
+
+        <!-- monitor feeds dashboard + alerting -->
+        <line class="sg-line" x1="285" y1="58" x2="150" y2="90"/>
+        <line class="sg-line" x1="315" y1="58" x2="450" y2="90"/>
+        <rect class="sg-dc-box-active" x="100" y="92" width="110" height="38" rx="8"/>
+        <text x="155" y="116" text-anchor="middle" class="sg-box-label">DASHBOARD</text>
+        <rect id="alertBox" class="sg-dc-box" x="390" y="92" width="110" height="38" rx="8"/>
+        <text x="445" y="116" text-anchor="middle" class="sg-box-label" id="alertLabel">ALERTING</text>
 
         <g id="radarRings"></g>
 
-        <line class="sg-line" x1="300" y1="80" x2="120" y2="200"/>
-        <line class="sg-line" x1="300" y1="80" x2="220" y2="230"/>
-        <line class="sg-line" x1="300" y1="80" x2="320" y2="230"/>
-        <line class="sg-line" x1="300" y1="80" x2="420" y2="200"/>
-        <line class="sg-line" x1="300" y1="80" x2="480" y2="260"/>
-        <line class="sg-line" x1="300" y1="80" x2="90" y2="270"/>
+        <line class="sg-line" x1="300" y1="58" x2="120" y2="220"/>
+        <line class="sg-line" x1="300" y1="58" x2="220" y2="250"/>
+        <line class="sg-line" x1="300" y1="58" x2="320" y2="250"/>
+        <line class="sg-line" x1="300" y1="58" x2="420" y2="220"/>
+        <line class="sg-line" x1="300" y1="58" x2="480" y2="280"/>
+        <line class="sg-line" x1="300" y1="58" x2="90" y2="290"/>
 
         <g id="watchedNodes">
-          <circle class="sg-node" cx="120" cy="215" r="20" data-r="152"/>
-          <circle class="sg-node" cx="220" cy="245" r="20" data-r="180"/>
-          <circle class="sg-node" cx="320" cy="245" r="20" data-r="168"/>
-          <circle class="sg-node" cx="420" cy="215" r="20" data-r="167"/>
-          <circle class="sg-node" cx="480" cy="275" r="20" data-r="234"/>
-          <circle class="sg-node" cx="90" cy="285" r="20" data-r="271"/>
+          <circle class="sg-node" cx="120" cy="235" r="18" data-r="180"/>
+          <circle class="sg-node" cx="220" cy="265" r="18" data-r="207"/>
+          <circle class="sg-node" cx="320" cy="265" r="18" data-r="196"/>
+          <circle id="anomalyNode" class="sg-node" cx="420" cy="235" r="18" data-r="195"/>
+          <circle class="sg-node" cx="480" cy="295" r="18" data-r="255"/>
+          <circle class="sg-node" cx="90" cy="305" r="18" data-r="288"/>
         </g>
-        <text x="300" y="360" text-anchor="middle" class="sg-label">ANOMALY DETECTION SWEEP</text>
+        <text x="300" y="368" text-anchor="middle" class="sg-label" id="observabilityStatusLabel">ANOMALY DETECTION SWEEP</text>
       </svg>
     </div>
     <div class="scrub-text">
@@ -456,11 +802,125 @@
 </section>
 
 <section id="skills">
+  <div class="blob-field section-blobs">
+    <div class="blob blob-sm" style="background:var(--accent3);top:6%;left:8%;"></div>
+    <div class="blob blob-sm" style="background:var(--accent4);bottom:6%;right:6%;animation-delay:2s;"></div>
+  </div>
   <div class="reveal" style="text-align:center;">
     <div class="eyebrow">SKILLS</div>
     <h2 class="section-title">The toolkit.</h2>
     <p class="section-sub" style="margin-left:auto;margin-right:auto;">Languages, systems, and tools I use to keep production reliable.</p>
   </div>
+
+  <div class="tech-marquee reveal">
+    <div class="tech-track">
+      <!-- set 1 -->
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <path fill="#3776AB" d="M24 4c-3 0-5.6.3-7.8.8-3.5.8-4.1 2.5-4.1 5.6v4.1h8.2v1.1H8.6c-3.1 0-5.9 1.9-6.7 5.5-1 4.1-1.1 6.7 0 11 .8 3.2 2.7 5.5 5.8 5.5h3.8v-5c0-3.5 3-6.6 6.6-6.6h8.2c3 0 5.4-2.5 5.4-5.5v-10.3c0-2.9-2.5-5.1-5.4-5.6C29.9 4.3 26.9 4 24 4z"/>
+          <path fill="#FFD43B" d="M24 44c3 0 5.6-.3 7.8-.8 3.5-.8 4.1-2.5 4.1-5.6v-4.1h-8.2v-1.1h11.7c3.1 0 5.9-1.9 6.7-5.5 1-4.1 1.1-6.7 0-11-.8-3.2-2.7-5.5-5.8-5.5h-3.8v5c0 3.5-3 6.6-6.6 6.6h-8.2c-3 0-5.4 2.5-5.4 5.5v10.3c0 2.9 2.5 5.1 5.4 5.6C18.1 43.7 21.1 44 24 44z"/>
+          <circle cx="17.5" cy="10.5" r="1.4" fill="#0a0a0c"/>
+          <circle cx="30.5" cy="37.5" r="1.4" fill="#0a0a0c"/>
+        </svg>
+        <span>Python</span>
+      </div>
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <ellipse cx="24" cy="26" rx="16" ry="13" fill="#00ADD8"/>
+          <circle cx="16" cy="16" r="5.5" fill="#00ADD8"/>
+          <circle cx="32" cy="16" r="5.5" fill="#00ADD8"/>
+          <circle cx="16" cy="17" r="2.6" fill="#0a0a0c"/>
+          <circle cx="32" cy="17" r="2.6" fill="#0a0a0c"/>
+          <circle cx="16.8" cy="16.2" r="0.9" fill="#fff"/>
+          <circle cx="32.8" cy="16.2" r="0.9" fill="#fff"/>
+          <rect x="16" y="30" width="16" height="3" rx="1.5" fill="#0a0a0c" opacity="0.55"/>
+        </svg>
+        <span>Go</span>
+      </div>
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <ellipse cx="24" cy="20" rx="8" ry="9" fill="#f5f5f7"/>
+          <path d="M13 44c1-9 4-14 4-19 0-4 3-7 7-7s7 3 7 7c0 5 3 10 4 19-3 2-8 3-11 3s-8-1-11-3z" fill="#f5f5f7"/>
+          <ellipse cx="20.5" cy="18" rx="1.7" ry="2.2" fill="#0a0a0c"/>
+          <ellipse cx="27.5" cy="18" rx="1.7" ry="2.2" fill="#0a0a0c"/>
+          <path d="M22 24c1 1 3 1 4 0" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M17 35c3 1 11 1 14 0" stroke="#0a0a0c" stroke-width="1.4" opacity="0.4" fill="none"/>
+        </svg>
+        <span>Linux Kernel</span>
+      </div>
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <line x1="24" y1="12" x2="12" y2="30" class="sg-line" stroke="url(#tg1)" stroke-width="2.5"/>
+          <line x1="24" y1="12" x2="36" y2="30" class="sg-line" stroke="url(#tg1)" stroke-width="2.5"/>
+          <line x1="12" y1="30" x2="36" y2="30" class="sg-line" stroke="url(#tg1)" stroke-width="2.5"/>
+          <defs>
+            <linearGradient id="tg1" x1="0" y1="0" x2="48" y2="48">
+              <stop offset="0%" stop-color="#ff5da2"/>
+              <stop offset="50%" stop-color="#2997ff"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+          </defs>
+          <circle cx="24" cy="12" r="5" fill="#0a0a0c" stroke="url(#tg1)" stroke-width="2.5"/>
+          <circle cx="12" cy="30" r="5" fill="#0a0a0c" stroke="url(#tg1)" stroke-width="2.5"/>
+          <circle cx="36" cy="30" r="5" fill="#0a0a0c" stroke="url(#tg1)" stroke-width="2.5"/>
+        </svg>
+        <span>System Design</span>
+      </div>
+      <!-- set 2 (duplicate for seamless loop) -->
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <path fill="#3776AB" d="M24 4c-3 0-5.6.3-7.8.8-3.5.8-4.1 2.5-4.1 5.6v4.1h8.2v1.1H8.6c-3.1 0-5.9 1.9-6.7 5.5-1 4.1-1.1 6.7 0 11 .8 3.2 2.7 5.5 5.8 5.5h3.8v-5c0-3.5 3-6.6 6.6-6.6h8.2c3 0 5.4-2.5 5.4-5.5v-10.3c0-2.9-2.5-5.1-5.4-5.6C29.9 4.3 26.9 4 24 4z"/>
+          <path fill="#FFD43B" d="M24 44c3 0 5.6-.3 7.8-.8 3.5-.8 4.1-2.5 4.1-5.6v-4.1h-8.2v-1.1h11.7c3.1 0 5.9-1.9 6.7-5.5 1-4.1 1.1-6.7 0-11-.8-3.2-2.7-5.5-5.8-5.5h-3.8v5c0 3.5-3 6.6-6.6 6.6h-8.2c-3 0-5.4 2.5-5.4 5.5v10.3c0 2.9 2.5 5.1 5.4 5.6C18.1 43.7 21.1 44 24 44z"/>
+          <circle cx="17.5" cy="10.5" r="1.4" fill="#0a0a0c"/>
+          <circle cx="30.5" cy="37.5" r="1.4" fill="#0a0a0c"/>
+        </svg>
+        <span>Python</span>
+      </div>
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <ellipse cx="24" cy="26" rx="16" ry="13" fill="#00ADD8"/>
+          <circle cx="16" cy="16" r="5.5" fill="#00ADD8"/>
+          <circle cx="32" cy="16" r="5.5" fill="#00ADD8"/>
+          <circle cx="16" cy="17" r="2.6" fill="#0a0a0c"/>
+          <circle cx="32" cy="17" r="2.6" fill="#0a0a0c"/>
+          <circle cx="16.8" cy="16.2" r="0.9" fill="#fff"/>
+          <circle cx="32.8" cy="16.2" r="0.9" fill="#fff"/>
+          <rect x="16" y="30" width="16" height="3" rx="1.5" fill="#0a0a0c" opacity="0.55"/>
+        </svg>
+        <span>Go</span>
+      </div>
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <ellipse cx="24" cy="20" rx="8" ry="9" fill="#f5f5f7"/>
+          <path d="M13 44c1-9 4-14 4-19 0-4 3-7 7-7s7 3 7 7c0 5 3 10 4 19-3 2-8 3-11 3s-8-1-11-3z" fill="#f5f5f7"/>
+          <ellipse cx="20.5" cy="18" rx="1.7" ry="2.2" fill="#0a0a0c"/>
+          <ellipse cx="27.5" cy="18" rx="1.7" ry="2.2" fill="#0a0a0c"/>
+          <path d="M22 24c1 1 3 1 4 0" stroke="#ff9f0a" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M17 35c3 1 11 1 14 0" stroke="#0a0a0c" stroke-width="1.4" opacity="0.4" fill="none"/>
+        </svg>
+        <span>Linux Kernel</span>
+      </div>
+      <div class="tech-item">
+        <svg viewBox="0 0 48 48" class="tech-icon">
+          <line x1="24" y1="12" x2="12" y2="30" class="sg-line" stroke="url(#tg2)" stroke-width="2.5"/>
+          <line x1="24" y1="12" x2="36" y2="30" class="sg-line" stroke="url(#tg2)" stroke-width="2.5"/>
+          <line x1="12" y1="30" x2="36" y2="30" class="sg-line" stroke="url(#tg2)" stroke-width="2.5"/>
+          <defs>
+            <linearGradient id="tg2" x1="0" y1="0" x2="48" y2="48">
+              <stop offset="0%" stop-color="#ff5da2"/>
+              <stop offset="50%" stop-color="#2997ff"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+          </defs>
+          <circle cx="24" cy="12" r="5" fill="#0a0a0c" stroke="url(#tg2)" stroke-width="2.5"/>
+          <circle cx="12" cy="30" r="5" fill="#0a0a0c" stroke="url(#tg2)" stroke-width="2.5"/>
+          <circle cx="36" cy="30" r="5" fill="#0a0a0c" stroke="url(#tg2)" stroke-width="2.5"/>
+        </svg>
+        <span>System Design</span>
+      </div>
+    </div>
+  </div>
+
   <div class="skills-grid reveal">
     <div class="skill-card"><h3>Languages & Systems</h3><p>Python, Go, Bash, C, Linux</p></div>
     <div class="skill-card"><h3>Distributed Systems & SRE</h3><p>Distributed Systems, Reliability Engineering, High Availability, SLO/SLA Management</p></div>
@@ -478,10 +938,30 @@
   <div class="scrub-sticky">
     <div class="scrub-graphic">
       <svg viewBox="0 0 600 400">
-        <text x="300" y="30" text-anchor="middle" class="sg-label">DISTRIBUTED CLUSTER — 100+ NODES</text>
-        <g id="clusterGrid"></g>
-        <path id="heartbeatPath" class="sg-pulse" d="M40,360 L180,360 L200,320 L220,380 L245,340 L265,360 L560,360" stroke-dasharray="1" stroke-dashoffset="1"/>
-        <text x="300" y="390" text-anchor="middle" class="sg-label">ONE HEARTBEAT, GLOBALLY SYNCED</text>
+        <text x="300" y="16" text-anchor="middle" class="sg-label">GEO-DISTRIBUTED CLUSTER — 75+ NODES / 3 REGIONS</text>
+
+        <!-- global sync hub -->
+        <rect x="255" y="24" width="90" height="30" rx="8" fill="#1d1d1f" stroke="#2997ff" stroke-width="2"/>
+        <text x="300" y="44" text-anchor="middle" class="sg-box-label">SYNC HUB</text>
+        <line class="sg-line" x1="280" y1="54" x2="115" y2="82"/>
+        <line class="sg-line" x1="300" y1="54" x2="300" y2="82"/>
+        <line class="sg-line" x1="320" y1="54" x2="485" y2="82"/>
+
+        <!-- three region racks -->
+        <rect id="regionUS" class="sg-dc-box" x="20" y="84" width="170" height="150" rx="10"/>
+        <text x="105" y="104" text-anchor="middle" class="sg-box-label">REGION — US</text>
+        <g id="regionUSGrid"></g>
+
+        <rect id="regionEU" class="sg-dc-box" x="215" y="84" width="170" height="150" rx="10"/>
+        <text x="300" y="104" text-anchor="middle" class="sg-box-label">REGION — EU</text>
+        <g id="regionEUGrid"></g>
+
+        <rect id="regionAP" class="sg-dc-box" x="410" y="84" width="170" height="150" rx="10"/>
+        <text x="495" y="104" text-anchor="middle" class="sg-box-label">REGION — APAC</text>
+        <g id="regionAPGrid"></g>
+
+        <path id="heartbeatPath" class="sg-pulse" d="M20,268 L160,268 L180,232 L200,290 L222,250 L242,268 L580,268" stroke-dasharray="1" stroke-dashoffset="1"/>
+        <text x="300" y="300" text-anchor="middle" class="sg-label" id="clusterStatusLabel">ONE HEARTBEAT, GLOBALLY SYNCED</text>
       </svg>
     </div>
     <div class="scrub-text">
@@ -493,6 +973,10 @@
 </section>
 
 <section id="achievements">
+  <div class="blob-field section-blobs">
+    <div class="blob blob-sm" style="background:var(--accent2);top:10%;right:6%;"></div>
+    <div class="blob blob-sm" style="background:var(--accent);bottom:10%;left:8%;animation-delay:1.5s;"></div>
+  </div>
   <div class="reveal" style="text-align:center;">
     <div class="eyebrow">ACHIEVEMENTS</div>
     <h2 class="section-title">Impact, measured.</h2>
@@ -556,6 +1040,10 @@
 </section>
 
 <section id="education">
+  <div class="blob-field section-blobs">
+    <div class="blob blob-sm" style="background:var(--accent);top:8%;left:10%;"></div>
+    <div class="blob blob-sm" style="background:var(--accent3);bottom:8%;right:8%;animation-delay:1s;"></div>
+  </div>
   <div class="reveal" style="text-align:center;">
     <div class="eyebrow">EDUCATION</div>
     <h2 class="section-title">Foundations.</h2>
@@ -573,6 +1061,10 @@
 </section>
 
 <section id="contact">
+  <div class="blob-field section-blobs">
+    <div class="blob blob-sm" style="background:var(--accent4);top:10%;right:10%;"></div>
+    <div class="blob blob-sm" style="background:var(--accent2);bottom:6%;left:6%;animation-delay:2s;"></div>
+  </div>
   <div class="reveal" style="text-align:center;">
     <div class="eyebrow">CONTACT</div>
     <h2 class="section-title">Let's talk.</h2>
@@ -588,6 +1080,35 @@
 <footer>© 2026 Abhay Tiwari. Built with care.</footer>
 
 <script>
+  // Custom cursor (desktop / fine-pointer only)
+  if (window.matchMedia('(pointer: fine)').matches) {
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    let ringX = window.innerWidth / 2, ringY = window.innerHeight / 2;
+    let targetX = ringX, targetY = ringY;
+
+    window.addEventListener('mousemove', (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      dot.style.left = targetX + 'px';
+      dot.style.top = targetY + 'px';
+    });
+
+    function animateRing() {
+      ringX += (targetX - ringX) * 0.18;
+      ringY += (targetY - ringY) * 0.18;
+      ring.style.left = ringX + 'px';
+      ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button, .skill-card, .achieve-card').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('grow'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('grow'));
+    });
+  }
+
   // Nav hide on scroll down, show on scroll up
   let lastScroll = 0;
   const nav = document.getElementById('nav');
@@ -598,84 +1119,170 @@
     lastScroll = cur;
   });
 
-  // Segregated scroll-scrubbed sections: each animation lives in its own
-  // pinned section with its own local scroll progress (0-1). They are
-  // completely independent — scrolling through one never affects another.
-  function registerScrub(sectionId, onProgress) {
+  // ============================================================
+  // SCROLL-LOCKED DIAGRAM SECTIONS
+  // Each diagram section is exactly one viewport tall (CSS scroll-snap
+  // pulls it fully into view, even on a fast fling). While a diagram
+  // section fills the screen, wheel/touch input is intercepted here and
+  // used to drive the diagram's own progress (0 -> 1) instead of the
+  // page scroll position. Only once the animation has completely
+  // finished in the direction you're scrolling does the page continue
+  // on to the next/previous section — so it's never possible to scroll
+  // past a diagram mid-animation, and it reverses cleanly on scroll-up.
+  // ============================================================
+  const scrubControllers = [];
+
+  function createScrub(sectionId, diagramFn) {
     const section = document.getElementById(sectionId);
     if (!section) return;
-    function update() {
-      const rect = section.getBoundingClientRect();
-      const total = section.offsetHeight - window.innerHeight;
-      let progress = -rect.top / total;
-      progress = Math.max(0, Math.min(1, progress));
-      onProgress(progress);
-    }
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    update();
+    const graphic = section.querySelector('.scrub-graphic');
+    const text = section.querySelector('.scrub-text');
+    const controller = { section, progress: 0 };
+
+    controller.render = function (p) {
+      controller.progress = p;
+      diagramFn(p);
+
+      if (graphic) {
+        const rotate = (0.5 - p) * 14;
+        const scale = 0.9 + Math.sin(p * Math.PI) * 0.12;
+        graphic.style.transform = `translate(-50%,-50%) rotateX(${rotate}deg) scale(${scale})`;
+      }
+      if (text) {
+        let textT;
+        if (p < 0.12) textT = p / 0.12;
+        else if (p > 0.88) textT = (1 - p) / 0.12;
+        else textT = 1;
+        textT = Math.max(0, Math.min(1, textT));
+        const rise = (1 - textT) * 26;
+        text.style.opacity = textT;
+        text.style.transform = `translateX(-50%) translateY(${rise}px)`;
+      }
+    };
+
+    controller.render(0);
+    scrubControllers.push(controller);
   }
 
-  // --- 1. Failover diagram ---
+  // --- 1. Failover diagram: LB reroutes around a dead app node, DB tier
+  //        keeps replicating underneath the whole time. ---
   (function () {
     const rerouteLine = document.getElementById('rerouteLine');
     const rerouteDot = document.getElementById('rerouteDot');
     const rerouteLen = rerouteLine.getTotalLength();
     rerouteLine.setAttribute('stroke-dasharray', rerouteLen);
 
-    registerScrub('scrub-failover', (p) => {
-      rerouteLine.setAttribute('stroke-dashoffset', rerouteLen * (1 - p));
-      const pt = rerouteLine.getPointAtLength(rerouteLen * p);
+    const dbSyncDot = document.getElementById('dbSyncDot');
+    const statusLabel = document.getElementById('failoverStatusLabel');
+
+    createScrub('scrub-failover', (p) => {
+      const reroute = Math.min(1, p / 0.7);
+      rerouteLine.setAttribute('stroke-dashoffset', rerouteLen * (1 - reroute));
+      const pt = rerouteLine.getPointAtLength(rerouteLen * reroute);
       rerouteDot.setAttribute('cx', pt.x);
       rerouteDot.setAttribute('cy', pt.y);
-      rerouteDot.style.opacity = p > 0.02 ? 1 : 0;
+      rerouteDot.style.opacity = reroute > 0.02 && reroute < 1 ? 1 : 0;
+
+      const t = (p * 3) % 1;
+      dbSyncDot.setAttribute('cx', 290 + t * 20);
+      dbSyncDot.setAttribute('cy', 307);
+
+      if (p < 0.15) statusLabel.textContent = 'ALL APP NODES HEALTHY';
+      else if (p < 0.7) statusLabel.textContent = 'APP 2 DOWN — REROUTING TRAFFIC';
+      else statusLabel.textContent = 'TRAFFIC RESTORED — ZERO DOWNTIME';
     });
   })();
 
-  // --- 2. Observability radar sweep ---
+  // --- 2. Observability: radar sweep finds an anomaly, dashboard updates,
+  //        alert box lights up once the anomalous node is detected. ---
   (function () {
     const radarRingsGroup = document.getElementById('radarRings');
     const watchedNodes = document.querySelectorAll('#watchedNodes .sg-node');
+    const anomalyNode = document.getElementById('anomalyNode');
+    const alertBox = document.getElementById('alertBox');
+    const alertLabel = document.getElementById('alertLabel');
+    const statusLabel = document.getElementById('observabilityStatusLabel');
+    const anomalyR = parseFloat(anomalyNode.getAttribute('data-r'));
 
-    registerScrub('scrub-observability', (p) => {
-      const maxR = 260;
+    createScrub('scrub-observability', (p) => {
+      const maxR = 300;
       const ringR = p * maxR;
-      radarRingsGroup.innerHTML = `<circle cx="300" cy="80" r="${ringR}" fill="none" stroke="#2997ff" stroke-width="2" opacity="${Math.max(0, 0.6 - p * 0.5)}"/>`;
+      radarRingsGroup.innerHTML = `<circle cx="300" cy="40" r="${ringR}" fill="none" stroke="#2997ff" stroke-width="2" opacity="${Math.max(0, 0.6 - p * 0.5)}"/>`;
       watchedNodes.forEach(n => {
+        if (n.id === 'anomalyNode') return;
         const nodeR = parseFloat(n.getAttribute('data-r'));
         n.setAttribute('class', ringR >= nodeR ? 'sg-node-alive' : 'sg-node');
       });
+
+      const found = ringR >= anomalyR;
+      anomalyNode.setAttribute('class', found ? 'sg-node-dead' : 'sg-node');
+      alertBox.setAttribute('class', found ? 'sg-dc-box-dead' : 'sg-dc-box');
+      alertLabel.textContent = found ? 'ALERT FIRED' : 'ALERTING';
+
+      if (p < 0.05) statusLabel.textContent = 'ANOMALY DETECTION SWEEP';
+      else if (!found) statusLabel.textContent = 'SCANNING CLUSTER…';
+      else statusLabel.textContent = 'DEGRADATION DETECTED — ALERT FIRED';
     });
   })();
 
-  // --- 3. 100+ node cluster heartbeat ---
+  // --- 3. Geo-distributed cluster: three regions light up in sequence as
+  //        the heartbeat sweeps left to right, then the sync hub confirms. ---
   (function () {
-    const clusterGrid = document.getElementById('clusterGrid');
-    const clusterNodes = [];
-    const COLS = 14, ROWS = 5;
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
-        const cx = 60 + c * (480 / (COLS - 1));
-        const cy = 70 + r * 45;
-        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        dot.setAttribute('cx', cx);
-        dot.setAttribute('cy', cy);
-        dot.setAttribute('r', 6);
-        dot.setAttribute('class', 'sg-node');
-        clusterGrid.appendChild(dot);
-        clusterNodes.push(dot);
+    function buildRegionGrid(groupId, originX, originY) {
+      const group = document.getElementById(groupId);
+      const nodes = [];
+      const COLS = 5, ROWS = 5;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cx = originX + c * 28;
+          const cy = originY + r * 22;
+          const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.setAttribute('cx', cx);
+          dot.setAttribute('cy', cy);
+          dot.setAttribute('r', 5);
+          dot.setAttribute('class', 'sg-node');
+          group.appendChild(dot);
+          nodes.push(dot);
+        }
       }
+      return nodes;
     }
+
+    const usNodes = buildRegionGrid('regionUSGrid', 40, 122);
+    const euNodes = buildRegionGrid('regionEUGrid', 235, 122);
+    const apNodes = buildRegionGrid('regionAPGrid', 430, 122);
+    const regionBoxes = {
+      us: document.getElementById('regionUS'),
+      eu: document.getElementById('regionEU'),
+      ap: document.getElementById('regionAP'),
+    };
+    const statusLabel = document.getElementById('clusterStatusLabel');
+
     const heartbeatPath = document.getElementById('heartbeatPath');
     const heartbeatLen = heartbeatPath.getTotalLength();
     heartbeatPath.setAttribute('stroke-dasharray', heartbeatLen);
 
-    registerScrub('scrub-cluster', (p) => {
+    function litClass(active) { return active ? 'sg-node-alive' : 'sg-node'; }
+    function boxClass(active) { return active ? 'sg-dc-box-active' : 'sg-dc-box'; }
+
+    createScrub('scrub-cluster', (p) => {
       heartbeatPath.setAttribute('stroke-dashoffset', heartbeatLen * (1 - p));
-      const activeCount = Math.floor(p * clusterNodes.length);
-      clusterNodes.forEach((n, i) => {
-        n.setAttribute('class', i < activeCount ? 'sg-node-alive' : 'sg-node');
-      });
+
+      const usOn = p > 0.05;
+      const euOn = p > 0.38;
+      const apOn = p > 0.68;
+
+      usNodes.forEach((n, i) => n.setAttribute('class', litClass(usOn && p > 0.05 + (i / usNodes.length) * 0.25)));
+      euNodes.forEach((n, i) => n.setAttribute('class', litClass(euOn && p > 0.38 + (i / euNodes.length) * 0.25)));
+      apNodes.forEach((n, i) => n.setAttribute('class', litClass(apOn && p > 0.68 + (i / apNodes.length) * 0.25)));
+
+      regionBoxes.us.setAttribute('class', boxClass(usOn));
+      regionBoxes.eu.setAttribute('class', boxClass(euOn));
+      regionBoxes.ap.setAttribute('class', boxClass(apOn));
+
+      if (p < 0.05) statusLabel.textContent = 'ONE HEARTBEAT, GLOBALLY SYNCED';
+      else if (!apOn) statusLabel.textContent = 'SYNCING REGIONS…';
+      else statusLabel.textContent = 'ALL REGIONS IN SYNC';
     });
   })();
 
@@ -697,7 +1304,6 @@
     const cdLen = clientDR.getTotalLength();
     clientDR.setAttribute('stroke-dasharray', cdLen);
 
-    // Build a handful of replication dots that flow left -> right while active
     const DOT_COUNT = 4;
     const dots = [];
     for (let i = 0; i < DOT_COUNT; i++) {
@@ -708,11 +1314,7 @@
       dots.push(d);
     }
 
-    registerScrub('scrub-vvr', (p) => {
-      // Phase A (0 - 0.45): steady replication, client talks to primary
-      // Phase B (0.45 - 0.65): primary fails
-      // Phase C (0.65 - 1.0): DR promotes, client redirects to DR
-
+    createScrub('scrub-vvr', (p) => {
       const replActive = p < 0.5;
       replDotsGroup.style.opacity = replActive ? 1 : 0.15;
       dots.forEach((d, i) => {
@@ -722,18 +1324,15 @@
       });
       replLabel.textContent = replActive ? 'REPLICATING' : 'REPLICATION PAUSED';
 
-      // client -> primary line: fully drawn until failure begins, then retracts
       const cpProgress = Math.max(0, Math.min(1, 1 - (p - 0.4) / 0.2));
       clientPrimary.setAttribute('stroke-dashoffset', cpLen * (1 - Math.min(1, cpProgress)));
       clientPrimary.style.opacity = cpProgress;
 
-      // primary failure X fades in between 0.45 - 0.65
       const failT = Math.max(0, Math.min(1, (p - 0.45) / 0.2));
       primaryFail.style.opacity = failT;
       primaryBox.setAttribute('class', failT > 0.5 ? 'sg-dc-box-dead' : 'sg-dc-box-active');
       primaryLabel.textContent = failT > 0.5 ? 'PRIMARY DC — DOWN' : 'PRIMARY DC';
 
-      // DR promotion: box lights up, client line draws in from 0.6 - 1.0
       const promoteT = Math.max(0, Math.min(1, (p - 0.6) / 0.4));
       drBox.setAttribute('class', promoteT > 0.3 ? 'sg-dc-box-active' : 'sg-dc-box');
       drLabel.textContent = promoteT > 0.3 ? 'DR SITE — PROMOTED' : 'DR SITE';
@@ -746,6 +1345,24 @@
     });
   })();
 
+  // Wire every controller's progress to the standard sticky-scroll formula:
+  // progress = how far you've scrolled through the section's tall track,
+  // clamped 0-1. Because the inner stage is position:sticky, it visually
+  // stays put on screen for that entire scroll range — exactly the
+  // apple.com/macbook-pro effect — and reverses cleanly scrolling up.
+  scrubControllers.forEach((controller) => {
+    function update() {
+      const rect = controller.section.getBoundingClientRect();
+      const total = controller.section.offsetHeight - window.innerHeight;
+      let p = total > 0 ? -rect.top / total : 0;
+      p = Math.max(0, Math.min(1, p));
+      controller.render(p);
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  });
+
   // Reveal on scroll
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -753,6 +1370,41 @@
     });
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Timeline runner ball: travels down the experience rail as the section
+  // scrolls through the viewport, and travels back up on scroll-up.
+  (function () {
+    const timeline = document.getElementById('timeline');
+    const runner = document.getElementById('timelineRunner');
+    if (!timeline || !runner) return;
+    const items = document.querySelectorAll('#timeline .timeline-item');
+
+    function update() {
+      const rect = timeline.getBoundingClientRect();
+      const vh = window.innerHeight;
+      let progress = (vh - rect.top) / (rect.height + vh);
+      progress = Math.max(0, Math.min(1, progress));
+      const travel = timeline.offsetHeight - 18;
+      const runnerTop = progress * travel;
+      runner.style.top = runnerTop + 'px';
+      items.forEach(item => {
+        item.classList.toggle('passed', item.offsetTop <= runnerTop + 12);
+      });
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // Living backgrounds: each section's blob field blooms to life as it
+  // scrolls into view, and dims again as it leaves — like apple.com.
+  const blobObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      e.target.classList.toggle('in-view', e.isIntersecting);
+    });
+  }, { threshold: 0.25 });
+  document.querySelectorAll('.section-blobs').forEach(el => blobObserver.observe(el));
+
 </script>
 
 </body>
